@@ -219,7 +219,7 @@ async fn main() {
     } else if config.logging.print_pretty_logs {
         (Some(tracing_subscriber::fmt::layer().pretty()), None)
     } else {
-        (None, Some(tracing_subscriber::fmt::layer()))
+        (None, Some(tracing_subscriber::fmt::layer().json()))
     };
 
     // None will be ignored, so we will in reality only have one
