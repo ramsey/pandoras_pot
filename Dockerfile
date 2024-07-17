@@ -45,4 +45,5 @@ COPY --from=build --chown=satan:satan /config ./config
 USER satan:satan
 
 EXPOSE 8080
+EXPOSE 8081
 ENTRYPOINT ["./pandoras_pot", "./config"]
