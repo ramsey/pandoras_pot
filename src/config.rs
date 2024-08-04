@@ -303,6 +303,12 @@ pub(crate) struct LoggingConfig {
     /// settings.
     #[serde(default = "default_logging_no_stdout")]
     pub no_stdout: bool,
+
+    /// If JSON-formatted logs should be written to standard output. This will also exclude
+    /// span fields from logging in order to provide cleaner logs for production use.
+    /// This option has no effect if `print_pretty_logs` is also `true`.
+    #[serde(default = "default_logging_print_json_logs")]
+    pub print_json_logs: bool,
 }
 
 impl Default for LoggingConfig {
@@ -311,6 +317,7 @@ impl Default for LoggingConfig {
             output_path: default_logging_output_path(),
             print_pretty_logs: default_logging_print_pretty_logs(),
             no_stdout: default_logging_no_stdout(),
+            print_json_logs: default_logging_print_json_logs(),
         }
     }
 }
@@ -326,6 +333,10 @@ const fn default_logging_print_pretty_logs() -> bool {
 }
 
 const fn default_logging_no_stdout() -> bool {
+    false
+}
+
+const fn default_logging_print_json_logs() -> bool {
     false
 }
 
@@ -425,6 +436,9 @@ mod tests {
 
             # If pretty logs should be written to standard output.
             print_pretty_logs = true
+
+            # If JSON logs should be written to standard output.
+            print_json_logs = false
 
             # If no logs at all should be printed to stdout. Overrides other stdout logging
             # settings.
