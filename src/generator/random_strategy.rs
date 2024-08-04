@@ -5,6 +5,8 @@ use rand::{
     rngs::SmallRng,
     SeedableRng,
 };
+use std::thread::sleep;
+use std::time::Duration;
 use tokio::sync::mpsc;
 use tracing::instrument;
 
@@ -14,11 +16,15 @@ use super::{GeneratorStrategy, P_TAG_SIZE};
 #[derive(Clone, Debug)]
 pub(crate) struct Random {
     chunk_size: usize,
+    sleep_delay: u64,
 }
 
 impl Random {
-    pub fn new(chunk_size: usize) -> Self {
-        Self { chunk_size }
+    pub fn new(chunk_size: usize, sleep_delay: u64) -> Self {
+        Self {
+            chunk_size,
+            sleep_delay,
+        }
     }
 }
 
@@ -37,6 +43,10 @@ impl GeneratorStrategy for Random {
                 if tx.blocking_send(res).is_err() {
                     break;
                 }
+
+                if self.sleep_delay > 0 {
+                    sleep(Duration::from_millis(self.sleep_delay));
+                }
             }
         });
     }
@@ -44,6 +54,9 @@ impl GeneratorStrategy for Random {
 
 impl Default for Random {
     fn default() -> Self {
-        Self::new(GeneratorConfig::default().chunk_size)
+        Self::new(
+            GeneratorConfig::default().chunk_size,
+            GeneratorConfig::default().sleep_delay,
+        )
     }
 }

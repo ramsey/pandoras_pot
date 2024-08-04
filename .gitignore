@@ -5,6 +5,7 @@ target
 
 # Custom config, for use in for example docker
 config.toml
+data.txt
 
 *.log
 
