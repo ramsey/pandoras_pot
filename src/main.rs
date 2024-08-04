@@ -217,17 +217,20 @@ async fn main() {
     };
 
     // Set up tracing
-    let (pretty, ugly) = if config.logging.no_stdout {
-        (None, None)
+    let (pretty, ugly, json) = if config.logging.no_stdout {
+        (None, None, None)
     } else if config.logging.print_pretty_logs {
-        (Some(tracing_subscriber::fmt::layer().pretty()), None)
+        (Some(tracing_subscriber::fmt::layer().pretty()), None, None)
+    } else if config.logging.print_json_logs {
+        (None, None, Some(tracing_subscriber::fmt::layer().json().flatten_event(true).with_span_list(false)))
     } else {
-        (None, Some(tracing_subscriber::fmt::layer()))
+        (None, Some(tracing_subscriber::fmt::layer()), None)
     };
 
     // None will be ignored, so we will in reality only have one
     let subscriber = tracing_subscriber::Registry::default()
         .with(pretty)
+        .with(json)
         .with(ugly);
 
     let json_log = match fs::OpenOptions::new()
