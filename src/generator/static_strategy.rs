@@ -13,16 +13,18 @@ use super::GeneratorStrategy;
 #[derive(Clone, Debug)]
 pub(crate) struct Static {
     data: Bytes,
+    sleep_delay: u64,
 }
 
 impl Static {
-    pub fn new(input: &Path) -> Self {
+    pub fn new(input: &Path, sleep_delay: u64) -> Self {
         let data = fs::read_to_string(input).unwrap_or_else(|_| {
             println!("Data for static generator must be a path to a readable file.");
             exit(error_code::CANNOT_READ_GENERATOR_DATA_FILE);
         });
         Self {
             data: Bytes::from(data),
+            sleep_delay,
         }
     }
 }
@@ -36,6 +38,10 @@ impl GeneratorStrategy for Static {
                 loop {
                     if tx.send(self.data.clone()).await.is_err() {
                         break;
+                    }
+
+                    if self.sleep_delay > 0 {
+                        tokio::time::sleep(tokio::time::Duration::from_millis(self.sleep_delay)).await;
                     }
                 }
             }

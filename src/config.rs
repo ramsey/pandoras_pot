@@ -165,6 +165,12 @@ pub(crate) struct GeneratorConfig {
     /// output look like a valid stream of JSON that will eventually end (it won't).
     #[serde(default = "default_generator_prefix")]
     pub prefix: String,
+
+    /// The amount of time in milliseconds a generator may sleep between
+    /// loops generating data (to respond with data at a slower rate).
+    /// `0` means no sleeping between loops.
+    #[serde(default = "default_generator_sleep_delay")]
+    pub sleep_delay: u64,
 }
 
 // While one could argue being able to pass strings in data as well is nicer, we quickly run into the
@@ -210,6 +216,7 @@ impl Default for GeneratorConfig {
             default_generator_size_limit(),
             default_generator_chunk_buffer(),
             default_generator_prefix(),
+            default_generator_sleep_delay(),
         )
     }
 }
@@ -223,6 +230,7 @@ impl GeneratorConfig {
         size_limit: usize,
         chunk_buffer: usize,
         prefix: String,
+        sleep_delay: u64,
     ) -> Self {
         Self {
             chunk_size,
@@ -232,6 +240,7 @@ impl GeneratorConfig {
             size_limit,
             chunk_buffer,
             prefix,
+            sleep_delay,
         }
     }
 
@@ -274,6 +283,10 @@ const fn default_generator_chunk_buffer() -> usize {
 
 fn default_generator_prefix() -> String {
     "<!DOCTYPE html><html><body>".to_string()
+}
+
+const fn default_generator_sleep_delay() -> u64 {
+    0
 }
 
 #[derive(Debug, Clone, Serialize, Deserialize)]

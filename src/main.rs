@@ -106,13 +106,16 @@ fn create_app(config: &Config) -> Result<Router, i32> {
     // Create gen depending on config
     tracing::info!("Using generator: {}", config.generator.generator_type);
     let gen_strategy = match &config.generator.generator_type {
-        GeneratorType::Random => {
-            GeneratorStrategyContainer::Random(Random::new(config.generator.chunk_size))
-        }
+        GeneratorType::Random => GeneratorStrategyContainer::Random(Random::new(
+            config.generator.chunk_size,
+            config.generator.sleep_delay,
+        )),
         GeneratorType::MarkovChain(input) => GeneratorStrategyContainer::MarkovChain(
             MarkovChain::new(config.generator.chunk_size, input),
         ),
-        GeneratorType::Static(input) => GeneratorStrategyContainer::Static(Static::new(input)),
+        GeneratorType::Static(input) => {
+            GeneratorStrategyContainer::Static(Static::new(input, config.generator.sleep_delay))
+        }
     };
     let generator_confg = Arc::new(config.generator.clone());
     let generator = Generator::from_config(generator_confg);

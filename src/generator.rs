@@ -206,6 +206,7 @@ mod tests {
                 0, // No limit
                 1,
                 "<html>".to_string(),
+                0, // No delay
             ));
 
             let g = Generator::from_config(config);
